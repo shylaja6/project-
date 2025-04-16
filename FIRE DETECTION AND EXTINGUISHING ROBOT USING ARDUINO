@@ -1,0 +1,95 @@
+/*Program to control LED (ON/OFF) from ESP32 using Serial Bluetooth
+* Thanks to Neil Kolbans for his efoorts in adding the support to Arduino IDE
+* Turotial on: www.circuitdigest.com
+*/
+#include "BluetoothSerial.h" //Header File for Serial Bluetooth, will be added
+by default into Arduino
+BluetoothSerial ESP_BT; //Object for Bluetooth
+int m1=26;
+int m2=25;
+int m3=32;
+int m4=33;
+int flame=35;
+53
+int pump=12;
+String incoming;
+void setup()
+{
+ pinMode(flame,INPUT);
+
+pinMode(m1,OUTPUT);pinMode(m2,OUTPUT);pinMode(m3,OUTPUT);pi
+nMode(m4,OUTPUT);pinMode(pump,OUTPUT);
+
+digitalWrite(m1,LOW);digitalWrite(m2,LOW);digitalWrite(m3,LOW);digita
+lWrite(m4,LOW);digitalWrite(pump,LOW);
+ Serial.begin(9600); //Start Serial monitor in 9600
+ ESP_BT.begin("ESP32_FIRE_FIGHTING_ROBOT"); //Name of your
+Bluetooth Signal
+ Serial.println("Bluetooth Device is Ready to Pair");
+
+}
+void loop() {
+ while(1)
+ {
+ int flameval=digitalRead(flame);delay(10);
+ if(flameval==LOW)
+ {
+ ESP_BT.println("Fire alert\r\n");delay(10);
+ }
+ if (ESP_BT.available()) //Check if we receive anything from Bluetooth
+ //if(Serial.available())
+54
+ {
+ incoming = ESP_BT.readString(); //Read what we recevive
+ //incoming = Serial.readString(); //Read what we recevive
+ Serial.print("Received:"); Serial.println(incoming);
+ if (incoming[0] =='2')
+ {
+
+digitalWrite(m1,HIGH);digitalWrite(m2,LOW);digitalWrite(m3,HIGH);digit
+alWrite(m4,LOW);
+ delay(100);ESP_BT.println("FRONT");
+ }
+ else if (incoming[0] =='5')
+ {
+
+digitalWrite(m1,LOW);digitalWrite(m2,LOW);digitalWrite(m3,LOW);digita
+lWrite(m4,LOW);
+ delay(100);ESP_BT.println("STOP");
+ }
+ else if (incoming[0] =='4')
+ {
+
+digitalWrite(m1,HIGH);digitalWrite(m2,LOW);digitalWrite(m3,LOW);digit
+alWrite(m4,HIGH);
+ delay(100);ESP_BT.println("LEFT");
+ }
+ else if (incoming[0] =='6')
+ {
+55
+
+digitalWrite(m1,LOW);digitalWrite(m2,HIGH);digitalWrite(m3,HIGH);digit
+alWrite(m4,LOW);
+ delay(100);ESP_BT.println("RIGHT");
+ }
+ else if (incoming[0] =='8')
+ {
+
+digitalWrite(m1,LOW);digitalWrite(m2,HIGH);digitalWrite(m3,LOW);digit
+alWrite(m4,HIGH);
+ delay(100);ESP_BT.println("BACK");
+ }
+ else if (incoming[0] =='0')
+ {
+ digitalWrite(pump,LOW);
+ delay(100);ESP_BT.println("PUMP OFF");
+ }
+ else if (incoming[0] =='1')
+ {
+ digitalWrite(pump,HIGH);
+ delay(100);ESP_BT.println("PUMP ON");
+ }
+ }
+ delay(20);
+}
+}
